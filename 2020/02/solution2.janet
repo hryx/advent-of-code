@@ -1,0 +1,20 @@
+(defn check-row [valid-count]
+    (def line (or (file/read stdin :line) (break valid-count)))
+    (def cols (string/split " " (string/trim line)))
+    (if (not= 3 (length cols)) (break (check-row valid-count))) # skip empty line
+    (def positions (string/split "-" (get cols 0)))
+    (assert (= 2 (length positions)) "expected positions formatted as X-Y")
+    (def pos-1 (or (scan-number (get positions 0)) (error "expected position 1 to be number")))
+    (def pos-2 (or (scan-number (get positions 1)) (error "expected position 2 to be number")))
+    (def character (string/slice (get cols 1) 0 1))
+    (def password (get cols 2))
+    (def len (length password))
+    (if (or (> pos-1 len) (> pos-2 len)) (break valid-count)) # password too short
+    (def match-1 (= character (string/slice password (- pos-1 1) pos-1)))
+    (def match-2 (= character (string/slice password (- pos-2 1) pos-2)))
+    (if (not= match-1 match-2)
+        (check-row (+ 1 valid-count))
+        (check-row valid-count)
+    )
+)
+(print (check-row 0))
