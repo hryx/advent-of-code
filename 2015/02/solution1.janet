@@ -1,0 +1,11 @@
+(defn do-present [total]
+    (def line (or (file/read stdin :line) (break total)))
+    (def cols (string/split "x" (string/trim line)))
+    (if (not= 3 (length cols)) (break (do-present total)))
+    (def [sl sw sh] cols)
+    (def [l w h] [(assert (scan-number sl)) (assert (scan-number sw)) (assert (scan-number sh))])
+    (def sides [(* 2 l w) (* 2 l h) (* 2 w h)])
+    (def smallest (/ (min ;sides) 2))
+    (do-present (+ total ;sides smallest))
+)
+(print (do-present 0))
