@@ -26,7 +26,21 @@
     ) 0 seating)
 )
 
-(defn count-occupied-adjacent [seating row col]
+(defn occupied? [check-next seating [y x] [dy dx]]
+    (def check-pos [(+ y dy) (+ x dx)])
+    (def value (get-in seating check-pos))
+    (case value
+        :taken true
+        :empty false
+        :floor (check-next check-next seating check-pos [dy dx])
+        false
+    )
+)
+
+(def neighbor-occupied? (partial occupied? comment))
+(def line-of-sight-occupied? (partial occupied? occupied?))
+
+(defn count-occupied-adjacent [strat seating row col]
     (def dirs [
         [ 0  1]
         [-1  1]
@@ -38,18 +52,17 @@
         [ 1  1]
     ])
     (reduce (fn [total [dy dx]]
-        (+ total (if (= :taken
-            # get-in defaults to nil when an index is out of bounds. Thanks!
-            (get-in seating [(+ row dy) (+ col dx)])
-        ) 1 0))
+        (+ total (if (strat seating [row col] [dy dx]) 1 0))
     ) 0 dirs)
 )
 
 (defn new-state [seating row col]
+    (def tol (or (dyn :neighbor-tolerance) 4))
+    (def strat (or (dyn :check-neighbor-strategy) neighbor-occupied?))
     (def seat (get-in seating [row col]))
     (or (case seat
-        :empty (if (zero? (count-occupied-adjacent seating row col)) :taken)
-        :taken (if (>= (count-occupied-adjacent seating row col) 4) :empty)
+        :empty (if (zero? (count-occupied-adjacent strat seating row col)) :taken)
+        :taken (if (>= (count-occupied-adjacent strat seating row col) tol) :empty)
     ) seat)
 )
 
