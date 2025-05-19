@@ -1,0 +1,11 @@
+(defn do-present [total]
+    (def line (or (file/read stdin :line) (break total)))
+    (def cols (string/split "x" (string/trim line)))
+    (if (not= 3 (length cols)) (break (do-present total)))
+    (def [l w h] (map (fn [c] (assert (scan-number c))) cols))
+    (def dimensions [[l w] [l h] [h w]])
+    (def perimiters (map (fn [[x y]] (+ x x y y)) dimensions))
+    (def volume (* l w h))
+    (do-present (+ total (min ;perimiters) volume))
+)
+(print (do-present 0))

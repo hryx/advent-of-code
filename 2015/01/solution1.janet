@@ -1,0 +1,10 @@
+(def UP (get "(" 0))
+(def DOWN (get ")" 0))
+(var floor 0)
+(each char (file/read stdin :all)
+    (cond
+        (= char UP) (++ floor)
+        (= char DOWN) (-- floor)
+    )
+)
+(print floor)
